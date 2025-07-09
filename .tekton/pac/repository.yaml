@@ -1,0 +1,17 @@
+---
+apiVersion: "pipelinesascode.tekton.dev/v1alpha1"
+kind: Repository
+metadata:
+  name: my-repo
+  namespace: repo-pipelines
+spec:
+  url: "https://github.com/xinxin20020807/wudi"
+  git_provider:
+    secret:
+      name: "github-webhook-config"
+      # Set this if you have a different key in your secret
+      # key: "provider.token"
+    webhook_secret:
+      name: "github-webhook-config"
+      # Set this if you have a different key for your secret
+      # key: "webhook.secret"

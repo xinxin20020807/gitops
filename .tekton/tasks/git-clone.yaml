@@ -1,0 +1,171 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+  labels:
+    app.kubernetes.io/version: "1.0.0"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.38.0"
+    tekton.dev/categories: Git
+    tekton.dev/tags: "git,clone,source"
+    tekton.dev/displayName: "Git Clone"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >
+    Clone a Git repository into the output workspace.
+    Supports authentication via SSH keys or basic auth.
+  workspaces:
+    - name: output
+      description: The git repo will be cloned onto the volume backing this Workspace.
+    - name: ssh-directory
+      optional: true
+      description: |
+        A .ssh directory with private key, known_hosts, config, etc. Copied to
+        the user's home before git commands are executed. Used to authenticate
+        with the git remote when performing the clone. Binding a Secret to this
+        Workspace is strongly recommended over other volume types.
+    - name: basic-auth
+      optional: true
+      description: |
+        A Workspace containing a .gitconfig and .git-credentials file. These
+        will be copied to the user's home before any git commands are run. Any
+        other files in this Workspace are ignored. It is strongly recommended
+        to use ssh-directory over basic-auth whenever possible and to bind a
+        Secret to this Workspace over other volume types.
+    - name: ssl-ca-directory
+      optional: true
+      description: |
+        A workspace containing CA certificates, this will be used by Git to
+        verify the peer with when fetching or pushing over HTTPS.
+  params:
+    - name: url
+      description: Repository URL to clone from.
+      type: string
+    - name: revision
+      description: "Git revision to checkout (branch, tag, sha, ref)"
+      type: string
+      default: "main"
+    - name: depth
+      description: "Shallow clone depth (0 for full clone)"
+      type: string
+      default: "1"
+    - name: subdirectory
+      description: "Subdirectory to clone into (relative to workspace)"
+      type: string
+      default: ""
+    - name: deleteExisting
+      description: "Clean destination directory before cloning"
+      type: string
+      default: "true"
+    - name: verbose
+      description: "Enable verbose logging"
+      type: string
+      default: "false"
+    - name: gitInitImage
+      description: "Git init image to use"
+      type: string
+      default: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.44.0"
+  results:
+    - name: commit
+      description: The precise commit SHA that was fetched by this Task.
+    - name: url
+      description: The precise URL that was fetched by this Task.
+    - name: committer-date
+      description: The epoch timestamp of the commit that was fetched by this Task.
+  steps:
+    - name: clone
+      image: "$(params.gitInitImage)"
+      env:
+      - name: HOME
+        value: "/home/git"
+      - name: PARAM_URL
+        value: $(params.url)
+      - name: PARAM_REVISION
+        value: $(params.revision)
+      - name: PARAM_DEPTH
+        value: $(params.depth)
+      - name: PARAM_SUBDIRECTORY
+        value: $(params.subdirectory)
+      - name: PARAM_DELETE_EXISTING
+        value: $(params.deleteExisting)
+      - name: PARAM_VERBOSE
+        value: $(params.verbose)
+      - name: WORKSPACE_OUTPUT_PATH
+        value: $(workspaces.output.path)
+      - name: WORKSPACE_SSH_DIRECTORY_BOUND
+        value: $(workspaces.ssh-directory.bound)
+      - name: WORKSPACE_SSH_DIRECTORY_PATH
+        value: $(workspaces.ssh-directory.path)
+      - name: WORKSPACE_BASIC_AUTH_DIRECTORY_BOUND
+        value: $(workspaces.basic-auth.bound)
+      - name: WORKSPACE_BASIC_AUTH_DIRECTORY_PATH
+        value: $(workspaces.basic-auth.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+
+        if [ "${PARAM_VERBOSE}" = "true" ]; then
+          set -x
+        fi
+
+        echo "Cloning repository: ${PARAM_URL}"
+        echo "Revision: ${PARAM_REVISION}"
+        echo "Depth: ${PARAM_DEPTH}"
+
+        # Setup authentication
+        if [ "${WORKSPACE_BASIC_AUTH_DIRECTORY_BOUND}" = "true" ]; then
+          echo "Setting up basic auth"
+          cp "${WORKSPACE_BASIC_AUTH_DIRECTORY_PATH}/.git-credentials" "${HOME}/.git-credentials"
+          cp "${WORKSPACE_BASIC_AUTH_DIRECTORY_PATH}/.gitconfig" "${HOME}/.gitconfig"
+          chmod 400 "${HOME}/.git-credentials" "${HOME}/.gitconfig"
+        fi
+
+        if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" = "true" ]; then
+          echo "Setting up SSH auth"
+          cp -R "${WORKSPACE_SSH_DIRECTORY_PATH}" "${HOME}/.ssh"
+          chmod 700 "${HOME}/.ssh"
+          chmod -R 400 "${HOME}/.ssh"/*
+        fi
+
+        # Prepare checkout directory
+        CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}/${PARAM_SUBDIRECTORY}"
+
+        if [ "${PARAM_DELETE_EXISTING}" = "true" ] && [ -d "${CHECKOUT_DIR}" ]; then
+          echo "Cleaning existing directory"
+          rm -rf "${CHECKOUT_DIR:?}"/* "${CHECKOUT_DIR}"/.[!.]* "${CHECKOUT_DIR}"/..?* 2>/dev/null || true
+        fi
+
+        # Configure git
+        git config --global --add safe.directory "${WORKSPACE_OUTPUT_PATH}"
+        git config --global init.defaultBranch main
+
+        # Clone repository
+        /ko-app/git-init \
+          -url="${PARAM_URL}" \
+          -revision="${PARAM_REVISION}" \
+          -path="${CHECKOUT_DIR}" \
+          -depth="${PARAM_DEPTH}"
+
+        # Extract results
+        cd "${CHECKOUT_DIR}"
+        RESULT_SHA="$(git rev-parse HEAD)"
+        RESULT_COMMITTER_DATE="$(git log -1 --pretty=%ct)"
+
+        echo "Clone completed successfully"
+        echo "Commit SHA: ${RESULT_SHA}"
+        echo "Committer date: ${RESULT_COMMITTER_DATE}"
+
+        # Save results
+        printf "%s" "${RESULT_SHA}" > "$(results.commit.path)"
+        printf "%s" "${PARAM_URL}" > "$(results.url.path)"
+        printf "%s" "${RESULT_COMMITTER_DATE}" > "$(results.committer-date.path)"
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 10m
+        limits:
+          memory: 128Mi
+          cpu: 100m
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
