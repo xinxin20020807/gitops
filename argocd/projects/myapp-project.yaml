@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   labels:
     project: myapp
-spec:
+spec:kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
   description: "MyApp GitOps Project"
   sourceRepos:
     - 'https://github.com/xinxin20020807/gitops.git'
