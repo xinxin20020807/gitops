@@ -16,7 +16,6 @@ commonLabels:
 
 commonAnnotations:
   environment: development
-  managed-by: argocd
 
 images:
   - name: uhub.service.ucloud.cn/base-images/wudi-app

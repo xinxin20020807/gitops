@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: myapp-dev-environments
+  name: myapp-environments
   namespace: argocd
   labels:
     app: myapp
-    environment: dev
+    managed-by: argocd
 spec:
   generators:
   - list:
@@ -13,6 +13,9 @@ spec:
       - environment: dev
         namespace: myapp-dev
         repoPath: overlays/dev
+      - environment: prod
+        namespace: myapp-prod
+        repoPath: overlays/prod
   template:
     metadata:
       name: 'myapp-{{environment}}'
@@ -20,6 +23,7 @@ spec:
       labels:
         environment: '{{environment}}'
         app: myapp
+        managed-by: argocd
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
@@ -32,10 +36,6 @@ spec:
         server: https://kubernetes.default.svc
         namespace: '{{namespace}}'
       syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-          allowEmpty: false
         syncOptions:
           - CreateNamespace=true
           - PrunePropagationPolicy=foreground

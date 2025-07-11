@@ -92,7 +92,7 @@ deploy_applications() {
     
     if [ "$method" = "applicationset" ]; then
         print_status "Deploying applications using ApplicationSet..."
-        kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
+        kubectl apply -f argocd/applicationsets/myapp-unified-applicationset.yaml
         print_success "ApplicationSet deployed"
     else
         print_status "Deploying individual applications..."

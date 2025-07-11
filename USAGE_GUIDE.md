@@ -14,7 +14,7 @@ cd /Users/mac/Data/codes/yaml/gitops
 kubectl apply -f argocd/projects/myapp-project.yaml
 
 # 应用ApplicationSet（推荐，会自动创建dev和prod两个应用）
-kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
+kubectl apply -f argocd/applicationsets/myapp-unified-applicationset.yaml
 ```
 
 ### 2. 验证配置是否生效
