@@ -34,10 +34,7 @@ spec:kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
       kind: Deployment
     - group: 'apps'
       kind: ReplicaSet
-    - group: 'extensions'
-      kind: Ingress
-    - group: 'networking.k8s.io'
-      kind: Ingress
+
     - group: 'networking.k8s.io'
       kind: NetworkPolicy
     - group: 'policy'

@@ -6,7 +6,6 @@ namespace: myapp-dev
 resources:
   - ../../base
   - namespace.yaml
-  # - ingress.yaml
 
 patchesStrategicMerge:
   - deployment-patch.yaml
