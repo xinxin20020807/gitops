@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: myapp-environments
+  namespace: argocd
+  labels:
+    app: myapp
+spec:
+  generators:
+  - list:
+      elements:
+      - environment: dev
+        namespace: myapp-dev
+        repoPath: overlays/dev
+        syncPolicy: automated
+        selfHeal: true
+        prune: true
+      - environment: prod
+        namespace: myapp-prod
+        repoPath: overlays/prod
+        syncPolicy: manual
+        selfHeal: false
+        prune: true
+  template:
+    metadata:
+      name: 'myapp-{{environment}}'
+      namespace: argocd
+      labels:
+        environment: '{{environment}}'
+        app: myapp
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: myapp-project
+      source:
+        repoURL: https://github.com/your-org/your-app-manifests.git
+        targetRevision: HEAD
+        path: 'manifests/{{repoPath}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: '{{prune}}'
+          selfHeal: '{{selfHeal}}'
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+      revisionHistoryLimit: 10
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas
+        - group: ""
+          kind: Service
+          jsonPointers:
+            - /spec/clusterIP

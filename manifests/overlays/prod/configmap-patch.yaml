@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp-config
+data:
+  app.properties: |
+    # Production environment configuration
+    server.port=8080
+    logging.level.root=WARN
+    logging.level.com.myapp=INFO
+    management.endpoints.web.exposure.include=health,info,metrics,prometheus
+    management.endpoint.health.show-details=when-authorized
+    management.metrics.export.prometheus.enabled=true
+    spring.profiles.active=prod
+  
+  database.properties: |
+    # Production database configuration
+    database.driver=postgresql
+    database.host=postgres-prod.example.com
+    database.port=5432
+    database.name=myapp_prod
+    database.pool.min-size=10
+    database.pool.max-size=50
+    database.connection.timeout=30000
+    database.idle.timeout=600000
+    database.max.lifetime=1800000
+    database.show-sql=false
+  
+  cache.properties: |
+    # Production cache configuration
+    cache.type=redis
+    cache.host=redis-prod.example.com
+    cache.port=6379
+    cache.ttl=3600
+    cache.max-entries=100000
+    cache.cluster.enabled=true

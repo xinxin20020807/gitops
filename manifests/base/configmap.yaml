@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp-config
+  labels:
+    app: myapp
+data:
+  app.properties: |
+    # Application configuration
+    server.port=8080
+    logging.level.root=INFO
+    management.endpoints.web.exposure.include=health,info,metrics
+    management.endpoint.health.show-details=always
+  
+  database.properties: |
+    # Database configuration
+    database.driver=postgresql
+    database.pool.min-size=5
+    database.pool.max-size=20
+    database.connection.timeout=30000
+  
+  cache.properties: |
+    # Cache configuration
+    cache.type=redis
+    cache.ttl=3600
+    cache.max-entries=10000
