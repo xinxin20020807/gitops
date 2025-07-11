@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       # 从目录名动态生成应用名称, 例如: dev-helloworld, staging-helloworld
-      name: '{{path.basename}}-helloworld'
+      name: '{{path.basename}}-wudi'
     spec:
       project: default
       source:
