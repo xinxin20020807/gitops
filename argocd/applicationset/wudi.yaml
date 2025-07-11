@@ -5,15 +5,14 @@ metadata:
   namespace: argocd
 spec:
   generators:
-  - git:
-      # TODO: 请将此 URL 替换为您的 Git 仓库地址
-      repoURL: https://github.com/xinxin20020807/gitops.git
-      revision: HEAD
-      directories:
-      - path: manifests/wudi/overlays/* # ArgoCD 将会扫描 overlays 目录下的所有环境
+    - git:
+        # TODO: 请将此 URL 替换为您的 Git 仓库地址
+        repoURL: https://github.com/xinxin20020807/gitops.git
+        revision: HEAD
+        directories:
+          - path: manifests/wudi/overlays/* # ArgoCD 将会扫描 overlays 目录下的所有环境
   template:
     metadata:
-      # 从目录名动态生成应用名称, 例如: dev-helloworld, staging-helloworld
       name: '{{path.basename}}-wudi'
     spec:
       project: default
@@ -23,10 +22,6 @@ spec:
         targetRevision: HEAD
         path: '{{path}}' # 应用的清单文件路径指向发现的目录
         kustomize: {}
-  # 当 ApplicationSet 资源被删除时, 其创建的 ArgoCD Application 也会被删除
-  syncPolicy:
-    preserveResourcesOnDeletion: false
-
       destination:
         server: https://kubernetes.default.svc
         # 从目录名动态生成命名空间, 例如: dev, staging
@@ -37,13 +32,13 @@ spec:
           selfHeal: true
           allowEmpty: false
         syncOptions:
-        - Validate=false
-        - CreateNamespace=true
-        - PrunePropagationPolicy=foreground
-        - PruneLast=true
+          - CreateNamespace=true
         retry:
           limit: 5
           backoff:
             duration: 5s
             factor: 2
             maxDuration: 3m
+  # 当 ApplicationSet 资源被删除时, 其创建的 ArgoCD Application 也会被删除
+  syncPolicy:
+    preserveResourcesOnDeletion: false
