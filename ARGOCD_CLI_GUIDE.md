@@ -44,7 +44,7 @@ argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD --insec
 ```bash
 # 首先应用kubectl配置（项目和ApplicationSet）
 kubectl apply -f argocd/projects/myapp-project.yaml
-kubectl apply -f argocd/applicationsets/myapp-unified-applicationset.yaml
+kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
 
 # 或者使用argocd命令创建应用
 argocd app create myapp-dev \

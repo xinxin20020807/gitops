@@ -13,7 +13,7 @@ gitops/
 │   ├── projects/                   # 项目配置
 │   │   └── myapp-project.yaml      # 项目权限和策略
 │   └── applicationsets/            # ApplicationSet配置
-│       └── myapp-unified-applicationset.yaml # 统一多环境管理
+│       └── myapp-applicationset.yaml # 开发环境管理
 └── manifests/                      # Kubernetes清单文件
     ├── base/                       # 基础配置
     │   ├── kustomization.yaml
@@ -108,8 +108,8 @@ kubectl apply -f argocd/applications/prod-app.yaml
 #### 方式二：使用ApplicationSet（推荐）
 
 ```bash
-# 使用ApplicationSet自动管理多环境
-kubectl apply -f argocd/applicationsets/myapp-unified-applicationset.yaml
+# 使用ApplicationSet自动管理开发环境
+kubectl apply -f argocd/applicationsets/myapp-applicationset.yaml
 ```
 
 ## 配置说明
@@ -139,7 +139,7 @@ kubectl apply -f argocd/applicationsets/myapp-unified-applicationset.yaml
 在以下文件中更新你的Git仓库地址：
 - `argocd/applications/dev-app.yaml`
 - `argocd/applications/prod-app.yaml`
-- `argocd/applicationsets/myapp-unified-applicationset.yaml`
+- `argocd/applicationsets/myapp-applicationset.yaml`
 - `argocd/projects/myapp-project.yaml`
 
 ### 修改域名

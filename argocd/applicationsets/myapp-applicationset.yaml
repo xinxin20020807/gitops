@@ -13,9 +13,6 @@ spec:
       - environment: dev
         namespace: myapp-dev
         repoPath: overlays/dev
-      - environment: prod
-        namespace: myapp-prod
-        repoPath: overlays/prod
   template:
     metadata:
       name: 'myapp-{{environment}}'
