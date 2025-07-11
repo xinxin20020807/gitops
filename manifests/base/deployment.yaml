@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: myapp:latest
+        image: uhub.service.ucloud.cn/base-images/wudi-app:latest
         ports:
         - containerPort: 8080
           name: http

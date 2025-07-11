@@ -24,7 +24,7 @@ commonAnnotations:
   managed-by: argocd
 
 images:
-  - name: myapp
+  - name: uhub.service.ucloud.cn/base-images/wudi-app
     newTag: v1.0.0
 
 replicas:

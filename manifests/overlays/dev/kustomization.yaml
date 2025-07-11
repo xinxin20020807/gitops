@@ -20,7 +20,7 @@ commonAnnotations:
   managed-by: argocd
 
 images:
-  - name: myapp
+  - name: uhub.service.ucloud.cn/base-images/wudi-app
     newTag: dev-latest
 
 replicas:

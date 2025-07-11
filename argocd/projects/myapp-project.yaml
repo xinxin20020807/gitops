@@ -8,7 +8,7 @@ metadata:
 spec:
   description: "MyApp GitOps Project"
   sourceRepos:
-    - 'https://github.com/your-org/your-app-manifests.git'
+    - 'https://github.com/xinxin20020807/gitops.git'
   destinations:
     - namespace: 'myapp-dev'
       server: https://kubernetes.default.svc

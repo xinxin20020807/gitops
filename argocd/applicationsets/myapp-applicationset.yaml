@@ -33,7 +33,7 @@ spec:
     spec:
       project: myapp-project
       source:
-        repoURL: https://github.com/your-org/your-app-manifests.git
+        repoURL: https://github.com/xinxin20020807/gitops.git
         targetRevision: HEAD
         path: 'manifests/{{repoPath}}'
       destination:

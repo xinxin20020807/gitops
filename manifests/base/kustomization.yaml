@@ -5,7 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - configmap.yaml
-  - secret.yaml
+  # - secret.yaml
 
 commonLabels:
   app: myapp
@@ -15,5 +15,5 @@ commonAnnotations:
   managed-by: argocd
 
 images:
-  - name: myapp
+  - name: uhub.service.ucloud.cn/base-images/wudi-app
     newTag: latest
