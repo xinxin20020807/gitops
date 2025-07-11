@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wudi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wudi
+  template:
+    metadata:
+      labels:
+        app: wudi
+    spec:
+      containers:
+      - name: wudi
+        image: uhub.service.ucloud.cn/base-images/wudi-app:latest
+        ports:
+        - containerPort: 80
