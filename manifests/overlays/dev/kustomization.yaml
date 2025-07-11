@@ -20,7 +20,7 @@ commonAnnotations:
 
 images:
   - name: uhub.service.ucloud.cn/base-images/wudi-app
-    newTag: dev-latest
+    newTag: latest
 
 replicas:
   - name: myapp
