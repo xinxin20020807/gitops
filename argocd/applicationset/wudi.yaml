@@ -6,7 +6,7 @@ metadata:
 spec:
   generators:
     - git:
-        # TODO: 请将此 URL 替换为您的 Git 仓库地址
+        # TODO: 请将此 URL 替换为您的 Git 仓库地址$
         repoURL: https://github.com/xinxin20020807/gitops.git
         revision: HEAD
         directories:
