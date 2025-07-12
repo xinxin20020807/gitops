@@ -7,5 +7,5 @@ resources:
 
 # Set the number of replicas for the dev environment
 replicas:
-- name: wudi-app
+- name: wudi
   count: 1
