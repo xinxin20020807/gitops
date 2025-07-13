@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: wudi
-        image: uhub.service.ucloud.cn/wudi1111/wudi:15033d0ae88eda9eee195951b8d2b17a786ba170
+        image: uhub.service.ucloud.cn/wudi1111/wudi:latest
         pullPolicy: Always
         ports:
         - containerPort: 80
